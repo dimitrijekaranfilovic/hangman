@@ -26,7 +26,7 @@ class HomeScreen(QWidget):
     def __init__(self):
         super(HomeScreen, self).__init__()
         self.picture_label = QLabel()
-        self.picture_label.setPixmap(QPixmap("./images/index.png"))
+        self.picture_label.setPixmap(QPixmap("./images/index2.png"))
 
         self.start_game = QPushButton("Start game")
         self.setStyleSheet("font: 12pt Times New Roman")

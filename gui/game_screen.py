@@ -29,13 +29,13 @@ class GameScreen(QWidget):
         super(GameScreen, self).__init__()
         self.state_picture = QLabel()
 
-        self.state1 = QPixmap("./images/stage1.png")
-        self.state2 = QPixmap("./images/stage2.png")
-        self.state3 = QPixmap("./images/stage3.png")
-        self.state4 = QPixmap("./images/stage4.png")
-        self.state5 = QPixmap("./images/stage5.png")
-        self.state6 = QPixmap("./images/stage6.png")
-        self.state7 = QPixmap("./images/stage7.png")
+        self.state1 = QPixmap("./images/stage12.png")
+        self.state2 = QPixmap("./images/stage22.png")
+        self.state3 = QPixmap("./images/stage32.png")
+        self.state4 = QPixmap("./images/stage42.png")
+        self.state5 = QPixmap("./images/stage52.png")
+        self.state6 = QPixmap("./images/stage62.png")
+        self.state7 = QPixmap("./images/stage72.png")
 
         self.states = [self.state1, self.state2, self.state3, self.state4, self.state5, self.state6, self.state7]
 
