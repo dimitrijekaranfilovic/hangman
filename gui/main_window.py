@@ -1,7 +1,6 @@
 """
     Game of Hangman written in Python.
     Copyright (C) 2019  Dimitrije Karanfilović
-    This file is part of pso.
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -108,6 +107,7 @@ class MainWindow(QMainWindow):
                 if self.current_state == 6:
                     QMessageBox.about(self, "Defeat", "You have lost!\nThe word was: '" + self.current_word + "'")
                     self.display(0)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
