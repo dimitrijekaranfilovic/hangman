@@ -13,28 +13,22 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>
 """
 
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QMainWindow, QStackedWidget, QMessageBox, QApplication
 from managers.word_manager import WordManager
+from managers.state_manager import StateManager
 from gui.home_screen import HomeScreen
 from gui.game_screen import GameScreen
-import sys
-import random
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.word_manager = WordManager()
-        self.current_word = ""
-        self.current_progress = []
-        self.progress_to_show = ""
-        self.current_state = 0
-        self.you_tried = ""
+        self.state_manager = StateManager()
 
         self.stack_widget = QStackedWidget()
         self.home_screen = HomeScreen()
-        self.game_screen = GameScreen()
+        self.game_screen = GameScreen(self.state_manager)
         self.stack_widget.addWidget(self.home_screen)
         self.stack_widget.addWidget(self.game_screen)
 
@@ -43,31 +37,19 @@ class MainWindow(QMainWindow):
 
         self.home_screen.start_game.clicked.connect(lambda: self.display(1))
         self.game_screen.submit_guess.clicked.connect(self.check_guess)
-        self.setStyleSheet("font: 12pt Times New Roman")
         self.setWindowTitle("Hangman")
         self.show()
 
-    def display(self, i):
-        self.stack_widget.setCurrentIndex(i)
-        if i == 1:
+    def display(self, index: int):
+        self.stack_widget.setCurrentIndex(index)
+        if index == 1:
             self.setFixedHeight(200)
-            self.start_game()
-            self.progress_to_show = "_ " * len(self.current_word)
-            self.game_screen.word_to_guess_edit.setText(self.progress_to_show)
-            self.current_progress = []
+            self.word_manager.start()
+            self.game_screen.word_to_guess_edit.setText(self.word_manager.get_display_progress())
             self.game_screen.your_guess_edit.clear()
-            self.game_screen.state_picture.setPixmap(self.game_screen.state1)
-            self.current_state = 0
-            self.you_tried = ""
-            self.game_screen.tried.setText(self.you_tried)
-            for s in self.current_word:
-                self.current_progress.append("_")
+            self.game_screen.tried.setText(self.word_manager.get_display_guesses())
         else:
             self.setFixedHeight(350)
-
-    def start_game(self):
-        self.current_word = random.choice(self.word_manager.word_list)
-        # print(self.current_word)
 
     def check_guess(self):
         guess = self.game_screen.your_guess_edit.text()
@@ -77,39 +59,30 @@ class MainWindow(QMainWindow):
         elif guess == "":
             QMessageBox.about(self, "Error", "You cannot submit an empty word!")
         else:
-            if guess in self.current_word:
-                QMessageBox.about(self, "Message", "Good guess!")
-                to_display = ""
-                for i in range(len(self.current_word)):
-                    current_letter = self.current_word[i]
-                    if current_letter == guess:
-                        to_display += guess
-                        to_display += " "
-                        self.current_progress[i] = guess
-
-                    else:
-                        to_display += self.current_progress[i]
-                        to_display += " "
-                self.progress_to_show = to_display
-                self.game_screen.word_to_guess_edit.setText(self.progress_to_show)
-                if "_" not in self.current_progress:
-                    QMessageBox.about(self, "Victory!", "You have won!")
-                    self.display(0)
-
-
+            if self.word_manager.is_already_guessed(guess):
+                QMessageBox.about(self, "Message!", f"You have already guessed that.")
             else:
-                QMessageBox.about(self, "Message", "Wrong guess!")
-                self.current_state += 1
-                self.you_tried += guess
-                self.you_tried += " "
-                self.game_screen.tried.setText(self.you_tried)
-                self.game_screen.state_picture.setPixmap(self.game_screen.states[self.current_state])
-                if self.current_state == 6:
-                    QMessageBox.about(self, "Defeat", "You have lost!\nThe word was: '" + self.current_word + "'")
-                    self.display(0)
+                if self.word_manager.is_guess_correct(guess):
+                    QMessageBox.about(self, "Message", "Good guess!")
+                    self.word_manager.update_progress(guess)
+                    to_display = self.word_manager.get_display_progress()
+                    self.game_screen.word_to_guess_edit.setText(to_display)
+                    if self.word_manager.is_word_guessed():
+                        QMessageBox.about(self, "Victory!", f"You have won! The word was '{self.word_manager.get_word()}'")
+                        self.display(0)
+                else:
+                    QMessageBox.about(self, "Message", "Wrong guess!")
+                    self.word_manager.add_guess(guess)
+                    self.game_screen.tried.setText(self.word_manager.get_display_guesses())
+                    self.state_manager.next_state()
+                    self.game_screen.update_image()
+                    if self.state_manager.is_final_state():
+                        QMessageBox.about(self, "Defeat", f"You have lost!\nThe word was: '{self.word_manager.get_word()}'")
+                        self.display(0)
 
 
 if __name__ == '__main__':
+    import sys
     app = QApplication(sys.argv)
     w = MainWindow()
     sys.exit(app.exec_())

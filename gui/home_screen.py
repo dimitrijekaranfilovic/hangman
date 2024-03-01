@@ -13,11 +13,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>
 """
 
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from managers.word_manager import WordManager
-import sys
-import random
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QApplication
+from PyQt5.QtGui import QPixmap
 
 
 class HomeScreen(QWidget):
@@ -42,6 +39,7 @@ class HomeScreen(QWidget):
 
 
 if __name__ == '__main__':
+    import sys
     app = QApplication(sys.argv)
     w = HomeScreen()
     sys.exit(app.exec_())

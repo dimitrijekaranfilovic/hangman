@@ -13,30 +13,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>
 """
 
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from managers.word_manager import WordManager
-import sys
-import random
-
+from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QApplication
+from PyQt5.QtGui import QPixmap
 
 class GameScreen(QWidget):
-    def __init__(self):
+    def __init__(self, state_manager):
         super(GameScreen, self).__init__()
         self.state_picture = QLabel()
+        self.state_manager = state_manager
 
-        self.state1 = QPixmap("./images/stage12.png")
-        self.state2 = QPixmap("./images/stage22.png")
-        self.state3 = QPixmap("./images/stage32.png")
-        self.state4 = QPixmap("./images/stage42.png")
-        self.state5 = QPixmap("./images/stage52.png")
-        self.state6 = QPixmap("./images/stage62.png")
-        self.state7 = QPixmap("./images/stage72.png")
-
-        self.states = [self.state1, self.state2, self.state3, self.state4, self.state5, self.state6, self.state7]
-
-        self.state_picture.setPixmap(self.state1)
-
+        self.update_image()
         self.word_to_guess_edit = QLineEdit()
         self.word_to_guess_edit.setReadOnly(True)
         self.submit_guess = QPushButton("Submit guess")
@@ -73,8 +59,12 @@ class GameScreen(QWidget):
         self.setLayout(v)
         self.show()
 
+    def update_image(self):
+        self.state_picture.setPixmap(QPixmap(f'./images/stage{self.state_manager.get_state()}.png'))
+
 
 if __name__ == '__main__':
+    import sys
     app = QApplication(sys.argv)
     w = GameScreen()
     sys.exit(app.exec_())
